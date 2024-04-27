@@ -113,7 +113,7 @@ namespace CPU_Scheduling.Algorithms
                             // agar bajarilayotgan bo'lsa
                             else
                             {
-                                // protsessorning ishlash vaqtiga tenglahsa
+                                // protsessorning ishlash vaqtiga tenglashsa
                                 if (mainForm.problems[i].ongoingTime == mainForm.processors[mainForm.problems[i].lastProcessorId - 1].processTime)
                                 {
                                     // faqat 1 ta vazifa qolgan bo'lsa
@@ -137,7 +137,7 @@ namespace CPU_Scheduling.Algorithms
                                         mainForm.problemsGrid[columnsCount, mainForm.problems[i].problemId].Value = "W";
 
                                         mainForm.problems[i].ongoingTime = 0;
-                                        mainForm.problems[i].lastProcessorId = mainForm.problems[i].lastProcessorId;
+                                        mainForm.problems[i].lastProcessorId = 0;
                                         mainForm.problems[i].lastWaitingTime++;
                                     }
                                 }
