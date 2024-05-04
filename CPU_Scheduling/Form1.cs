@@ -15,7 +15,7 @@ namespace CPU_Scheduling
     public partial class Form1 : Form
     {
         public int numProc = 1, numProb = 1;
-        bool started = false;
+        public bool started = false, stopped = false;
 
         public Problem[] problems;
         public Processor[] processors;
@@ -42,6 +42,37 @@ namespace CPU_Scheduling
             problemsGrid[2, 0].Value = 0;
             problemsGrid[3, 0].Value = 0;
 
+
+            // example values
+            processorsGrid.RowCount = 2;
+            problemsGrid.RowCount = 3;
+            numProcessors.Value = 2;
+            numProblems.Value = 3;
+            numProc = 2;
+            numProb = 3;
+
+            processorsGrid[0, 0].Value = 1;
+            processorsGrid[1, 0].Value = 2;
+            processorsGrid[2, 0].Value = "Free";
+            processorsGrid[0, 1].Value = 1;
+            processorsGrid[1, 1].Value = 3;
+            processorsGrid[2, 1].Value = "Free";
+
+            problemsGrid[0, 0].Value = 1;
+            problemsGrid[1, 0].Value = 0;
+            problemsGrid[2, 0].Value = 4;
+            problemsGrid[3, 0].Value = 0;
+            problemsGrid[0, 1].Value = 2;
+            problemsGrid[1, 1].Value = 1;
+            problemsGrid[2, 1].Value = 5;
+            problemsGrid[3, 1].Value = 0;
+            problemsGrid[0, 2].Value = 3;
+            problemsGrid[1, 2].Value = 0;
+            problemsGrid[2, 2].Value = 6;
+            problemsGrid[3, 2].Value = 0;
+            //// 
+
+
             InitializeValues();
         }
 
@@ -55,6 +86,8 @@ namespace CPU_Scheduling
                 processorsGrid[0, i - 1].Value = i;
                 processorsGrid[1, i - 1].Value = 1;
                 processorsGrid[2, i - 1].Value = "Free";
+
+                processorsGrid[0, i - 1].Style.BackColor = Color.LightSkyBlue;
             }
 
             numProc = n;
@@ -72,6 +105,8 @@ namespace CPU_Scheduling
                 problemsGrid[1, i - 1].Value = 0;
                 problemsGrid[2, i - 1].Value = 0;
                 problemsGrid[3, i - 1].Value = 0;
+
+                problemsGrid[0, i - 1].Style.BackColor = Color.LightSkyBlue;
             }
 
             numProb = n;
@@ -82,14 +117,14 @@ namespace CPU_Scheduling
         {
             InitializeValues();
             started = true;
+            stopped = false;
 
             switch (algorithmCombo.Text)
             {
-                //case "FCFS": problemsGrid.Columns.AddRange(FCFS.Start(this));  break;
-                case "FCFS": FCFS.Start(this);  break;
+                case "FCFS": Task.Run(() => FCFS.StartAsync(this));  break;
                 case "SJF": break;
                 case "RR": break;
-                default: MessageBox.Show("Scheduling algorithm is not selected !"); break;
+                default: MessageBox.Show("Scheduling algorithm is not selected !", "CPU SCHEDULER"); break;
             }
         }
 
@@ -106,7 +141,7 @@ namespace CPU_Scheduling
                 }
             }
         }
-
+         
         public void InitializeValues ()
         {
             problems = new Problem[numProb];
@@ -126,10 +161,35 @@ namespace CPU_Scheduling
             }
         }
 
+        private void stopBtn_Click(object sender, EventArgs e)
+        {
+            stopped = true;
+        }
+
         public void Clear ()
         {
             numProblems.Value = 1;
             numProcessors.Value = 1;
+            numProb = 1;
+            numProc = 1;
+
+            problemsGrid.Rows.Clear();
+            problemsGrid.ColumnCount = 4;
+
+            processorsGrid.Rows.Clear();
+            processorsGrid.ColumnCount = 3;
+
+            processorsGrid.RowCount = (int)numProcessors.Value;
+            problemsGrid.RowCount = (int)numProblems.Value;
+
+            processorsGrid[0, 0].Value = 1;
+            processorsGrid[1, 0].Value = 1;
+            processorsGrid[2, 0].Value = "Free";
+
+            problemsGrid[0, 0].Value = 1;
+            problemsGrid[1, 0].Value = 0;
+            problemsGrid[2, 0].Value = 0;
+            problemsGrid[3, 0].Value = 0;
 
             InitializeValues();
 

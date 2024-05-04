@@ -28,13 +28,14 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             this.panel1 = new System.Windows.Forms.Panel();
             this.label1 = new System.Windows.Forms.Label();
             this.panel2 = new System.Windows.Forms.Panel();
             this.panel4 = new System.Windows.Forms.Panel();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.managementGroup = new System.Windows.Forms.GroupBox();
+            this.stopBtn = new System.Windows.Forms.Button();
             this.clrBtn = new System.Windows.Forms.Button();
             this.algorithmCombo = new System.Windows.Forms.ComboBox();
             this.startBtn = new System.Windows.Forms.Button();
@@ -138,6 +139,7 @@
             this.managementGroup.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.managementGroup.Controls.Add(this.stopBtn);
             this.managementGroup.Controls.Add(this.clrBtn);
             this.managementGroup.Controls.Add(this.algorithmCombo);
             this.managementGroup.Controls.Add(this.startBtn);
@@ -149,6 +151,18 @@
             this.managementGroup.TabIndex = 5;
             this.managementGroup.TabStop = false;
             this.managementGroup.Text = "Management";
+            // 
+            // stopBtn
+            // 
+            this.stopBtn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.stopBtn.Location = new System.Drawing.Point(116, 56);
+            this.stopBtn.Name = "stopBtn";
+            this.stopBtn.Size = new System.Drawing.Size(75, 23);
+            this.stopBtn.TabIndex = 4;
+            this.stopBtn.Text = "Stop";
+            this.stopBtn.UseVisualStyleBackColor = true;
+            this.stopBtn.Click += new System.EventHandler(this.stopBtn_Click);
             // 
             // clrBtn
             // 
@@ -164,6 +178,7 @@
             // 
             // algorithmCombo
             // 
+            this.algorithmCombo.BackColor = System.Drawing.SystemColors.MenuBar;
             this.algorithmCombo.FormattingEnabled = true;
             this.algorithmCombo.Items.AddRange(new object[] {
             "FCFS",
@@ -215,6 +230,7 @@
             // numProblems
             // 
             this.numProblems.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)));
+            this.numProblems.BackColor = System.Drawing.SystemColors.MenuBar;
             this.numProblems.Location = new System.Drawing.Point(198, 36);
             this.numProblems.Maximum = new decimal(new int[] {
             30,
@@ -265,6 +281,7 @@
             // numProcessors
             // 
             this.numProcessors.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)));
+            this.numProcessors.BackColor = System.Drawing.SystemColors.MenuBar;
             this.numProcessors.Location = new System.Drawing.Point(160, 36);
             this.numProcessors.Maximum = new decimal(new int[] {
             20,
@@ -317,6 +334,7 @@
             this.processorsGrid.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
             this.processorsGrid.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.processorsGrid.BackgroundColor = System.Drawing.SystemColors.MenuBar;
             this.processorsGrid.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.processorsGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.processorsGrid.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
@@ -342,9 +360,9 @@
             // 
             // status
             // 
-            dataGridViewCellStyle3.BackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle3.ForeColor = System.Drawing.Color.Black;
-            this.status.DefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle1.BackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle1.ForeColor = System.Drawing.Color.Black;
+            this.status.DefaultCellStyle = dataGridViewCellStyle1;
             this.status.HeaderText = "Status";
             this.status.Name = "status";
             this.status.ReadOnly = true;
@@ -358,6 +376,7 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.problemsGrid.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.problemsGrid.BackgroundColor = System.Drawing.SystemColors.MenuBar;
             this.problemsGrid.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.problemsGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.problemsGrid.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
@@ -400,6 +419,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.SystemColors.GradientActiveCaption;
             this.ClientSize = new System.Drawing.Size(956, 490);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.panel1);
@@ -455,6 +475,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn startTime;
         private System.Windows.Forms.DataGridViewTextBoxColumn demandTime;
         private System.Windows.Forms.DataGridViewTextBoxColumn priority;
+        private System.Windows.Forms.Button stopBtn;
     }
 }
 

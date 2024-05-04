@@ -1,52 +1,52 @@
 ﻿using CPU_Scheduling.Models;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Eventing.Reader;
+using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Windows.Forms.AxHost;
 
 namespace CPU_Scheduling.Algorithms
 {
     internal class FCFS
     {
         static Form1 mainForm;
-        // static Problem[] problems;
-        // static Processor[] processors;
 
         
-        public static void Start(Form1 form) 
+        public static async void StartAsync(Form1 form) 
         {
             mainForm = form;
-            
-            /*mainForm.problemsGrid.Columns.Add("1", "10");
-            mainForm.problemsGrid.Columns.Add("2", "11");
-            mainForm.problemsGrid.Columns.Add("3", "12");
-            mainForm.problemsGrid.Columns.Add("4", "13");*/
 
-            OnProgress();
-
-            // problems = mainForm.problems;
-            // processors = mainForm.processors;
+            await OnProgressAsync();
         }
 
 
-        public static void OnProgress ()
+        public static async Task OnProgressAsync ()
         {
             int time = 0, notEnd = mainForm.numProb;
-            int columnsCount = mainForm.problemsGrid.Columns.Count;
+            int columnsCount = mainForm.problemsGrid.Columns.Count; 
             bool notEnded;
 
             do
             {
-                mainForm.problemsGrid.Columns.Add("time" + time.ToString(), time.ToString());
-                mainForm.problemsGrid.Columns[columnsCount].MinimumWidth = 25;
-
-                // kutish vaqti bo'yicha kamayish tartibida tartiblash
-                for (int i = 0; i < mainForm.numProb; i++)
+                mainForm.Invoke((MethodInvoker)delegate
                 {
-                    // MessageBox.Show(mainForm.problems[i].ToString());
+                    mainForm.problemsGrid.Columns.Add("time" + time.ToString(), time.ToString());
+                    mainForm.problemsGrid.Columns[columnsCount].MinimumWidth = 25;
+                });
+
+                // kutish vaqti bo'yicha kamayish tartibida tartiblash 
+                mainForm.problems = mainForm.problems.OrderBy(p => p.problemId).ToArray();
+                mainForm.problems = mainForm.problems.OrderByDescending(p => p.lastWaitingTime).ToArray();
+                // mainForm.problems = mainForm.problems.OrderBy(p => p.lastWaitingTime).ToArray();
+
+                /*for (int i = 0; i < mainForm.numProb; i++)
+                {
 
                     for (int j = i + 1; j < mainForm.numProb; j++)
                     {
@@ -57,8 +57,7 @@ namespace CPU_Scheduling.Algorithms
                             mainForm.problems[j] = tmp;
                         }
                     }
-                }
-
+                }*/
 
                 notEnded = false;
 
@@ -83,17 +82,42 @@ namespace CPU_Scheduling.Algorithms
                                 for (int j = 0; j < mainForm.numProc; j++)
                                 {
                                     // bo'sh protsessor topilsa
-                                    if (mainForm.processors[j].isFree)
+                                    if (mainForm.processors[j].isFree && 
+                                        mainForm.processors[j].lastProblemId != mainForm.problems[i].problemId &&
+                                        mainForm.processors[j].lastUsedTime != time)
                                     {
-                                        mainForm.processorsGrid[2, j].Value = "Busy";
-                                        mainForm.processors[j].isFree = false;
+                                        mainForm.Invoke((MethodInvoker)delegate
+                                        {
+                                            mainForm.processorsGrid[2, j].Value = "Busy";
+                                            mainForm.processorsGrid[2, j].Style.BackColor = Color.Yellow;
 
-                                        mainForm.problemsGrid[columnsCount, mainForm.problems[i].problemId].Value = "P" + (j + 1).ToString();
+                                            mainForm.problemsGrid[columnsCount, mainForm.problems[i].problemId].Value = 
+                                                                                                        "P" + (j + 1).ToString();
+                                            mainForm.problemsGrid[columnsCount, mainForm.problems[i].problemId].Style.BackColor = Color.LightGreen;
+                                        });
 
                                         mainForm.problems[i].requiredTime--;
                                         mainForm.problems[i].ongoingTime++;
                                         mainForm.problems[i].lastProcessorId = j + 1;
                                         mainForm.problems[i].lastWaitingTime = 0;
+
+                                        if (mainForm.problems[i].requiredTime != 0)
+                                        {
+                                            mainForm.processorsGrid[2, j].Style.BackColor = Color.Yellow;
+
+                                            mainForm.processors[j].isFree = false;
+                                            mainForm.processors[j].lastUsedTime = time;
+                                            mainForm.processors[j].lastProblemId = mainForm.problems[i].problemId;
+                                        }
+                                        else
+                                        {
+                                            mainForm.processorsGrid[2, 0].Style.BackColor = Color.LightGreen;
+                                            mainForm.processorsGrid[2, j].Value = "Free";
+
+                                            mainForm.processors[j].isFree = true;
+                                            mainForm.processors[j].lastUsedTime = time;
+                                            mainForm.processors[j].lastProblemId = mainForm.problems[i].problemId;
+                                        }
 
                                         started = true;
 
@@ -104,50 +128,134 @@ namespace CPU_Scheduling.Algorithms
                                 // birorta ham bo'sh protsessor topilmasa
                                 if (!started)
                                 {
-                                    mainForm.problemsGrid[columnsCount, mainForm.problems[i].problemId].Value = "W";
+                                    if (notEnd == 1)
+                                    {
+                                        mainForm.Invoke((MethodInvoker)delegate
+                                        {
+                                            if (mainForm.problems[i].lastProcessorId != 0)
+                                            {
+                                                mainForm.problemsGrid[columnsCount, mainForm.problems[i].problemId].Value = "P" + mainForm.problems[i].lastProcessorId.ToString();
 
-                                    mainForm.problems[i].lastWaitingTime++;
-                                    mainForm.problems[i].lastProcessorId = 0;
+                                                mainForm.processorsGrid[2, mainForm.problems[i].lastProcessorId].Value = "Busy";
+                                                mainForm.processorsGrid[2, mainForm.problems[i].lastProcessorId].Style.BackColor = Color.Yellow;
+                                            }
+                                            else
+                                            {
+                                                mainForm.problemsGrid[columnsCount, mainForm.problems[i].problemId].Value = "P";
+
+                                                mainForm.processorsGrid[2, 0].Value = "Busy";
+                                                mainForm.processorsGrid[2, 0].Style.BackColor = Color.Yellow;
+                                            }
+
+                                            mainForm.problemsGrid[columnsCount, mainForm.problems[i].problemId].Style.BackColor = Color.LightGreen;
+                                        });
+
+                                        mainForm.problems[i].requiredTime--;
+                                        mainForm.problems[i].lastWaitingTime = 0;
+                                        mainForm.problems[i].lastProcessorId = 0;
+                                        mainForm.problems[i].ongoingTime++;
+                                    }
+                                    else
+                                    {
+                                        mainForm.Invoke((MethodInvoker)delegate
+                                        {
+                                            mainForm.problemsGrid[columnsCount, mainForm.problems[i].problemId].Value = "W";
+                                            mainForm.problemsGrid[columnsCount, mainForm.problems[i].problemId].Style.BackColor = Color.LightBlue;
+                                        });
+
+                                        mainForm.problems[i].lastWaitingTime++;
+                                        mainForm.problems[i].lastProcessorId = 0;
+                                        mainForm.problems[i].ongoingTime = 0;
+                                    }
                                 }
                             }
                             // agar bajarilayotgan bo'lsa
                             else
                             {
                                 // protsessorning ishlash vaqtiga tenglashsa
-                                if (mainForm.problems[i].ongoingTime == mainForm.processors[mainForm.problems[i].lastProcessorId - 1].processTime)
+                                if (mainForm.problems[i].ongoingTime + 1 == mainForm.processors[mainForm.problems[i].lastProcessorId - 1].processTime)
                                 {
                                     // faqat 1 ta vazifa qolgan bo'lsa
                                     if (notEnd == 1)
                                     {
-                                        mainForm.processorsGrid[2, 0].Value = "Busy";
-                                        mainForm.processors[0].isFree = false;
+                                        mainForm.Invoke((MethodInvoker)delegate
+                                        {
+                                            if (mainForm.problems[i].lastProcessorId != 0)
+                                            {
+                                                mainForm.problemsGrid[columnsCount, mainForm.problems[i].problemId].Value = "P" + mainForm.problems[i].lastProcessorId.ToString();
 
-                                        mainForm.problemsGrid[columnsCount, mainForm.problems[i].problemId].Value = "P";
+                                                mainForm.processorsGrid[2, mainForm.problems[i].lastProcessorId].Value = "Busy";
+                                                mainForm.processorsGrid[2, mainForm.problems[i].lastProcessorId].Style.BackColor = Color.Yellow;
+                                            }
+                                            else
+                                            {
+                                                mainForm.problemsGrid[columnsCount, mainForm.problems[i].problemId].Value = "P";
+
+                                                mainForm.processorsGrid[2, 0].Value = "Busy";
+                                                mainForm.processorsGrid[2, 0].Style.BackColor = Color.Yellow;
+                                            }
+
+                                            mainForm.problemsGrid[columnsCount, mainForm.problems[i].problemId].Style.BackColor = Color.LightGreen;
+                                        });
+
+                                        mainForm.processors[mainForm.problems[i].lastProcessorId - 1].isFree = true;
+                                        mainForm.processors[mainForm.problems[i].lastProcessorId - 1].lastUsedTime = time;
+                                        mainForm.processors[mainForm.problems[i].lastProcessorId - 1].lastProblemId = -1;
 
                                         mainForm.problems[i].requiredTime--;
                                         mainForm.problems[i].ongoingTime++;
-                                        mainForm.problems[i].lastProcessorId = 1;
+                                        mainForm.problems[i].lastProcessorId = 0;
                                         mainForm.problems[i].lastWaitingTime = 0;
                                     }
                                     else
                                     {
-                                        mainForm.processorsGrid[2, mainForm.problems[i].lastProcessorId - 1].Value = "Free";
+                                        mainForm.Invoke((MethodInvoker)delegate
+                                        {
+                                            mainForm.processorsGrid[2, mainForm.problems[i].lastProcessorId - 1].Value = "Free";
+                                            mainForm.processorsGrid[2, mainForm.problems[i].lastProcessorId - 1].Style.BackColor = Color.LightGreen;
+
+                                            mainForm.problemsGrid[columnsCount, mainForm.problems[i].problemId].Value = "P" + mainForm.problems[i].lastProcessorId.ToString();
+                                            mainForm.problemsGrid[columnsCount, mainForm.problems[i].problemId].Style.BackColor = Color.LightGreen;
+                                        });
+
                                         mainForm.processors[mainForm.problems[i].lastProcessorId - 1].isFree = true;
+                                        mainForm.processors[mainForm.problems[i].lastProcessorId - 1].lastUsedTime = time;
+                                        mainForm.processors[mainForm.problems[i].lastProcessorId - 1].lastProblemId = mainForm.problems[i].problemId;
 
-                                        mainForm.problemsGrid[columnsCount, mainForm.problems[i].problemId].Value = "W";
-
+                                        mainForm.problems[i].requiredTime--;
                                         mainForm.problems[i].ongoingTime = 0;
                                         mainForm.problems[i].lastProcessorId = 0;
-                                        mainForm.problems[i].lastWaitingTime++;
+                                        mainForm.problems[i].lastWaitingTime = 0;
                                     }
                                 }
                                 // oxirgi protsessori bilan ishlashni davom ettirish
                                 else
                                 {
-                                    mainForm.processorsGrid[2, mainForm.problems[i].lastProcessorId - 1].Value = "Busy";
-                                    mainForm.processors[mainForm.problems[i].lastProcessorId - 1].isFree = false;
+                                    mainForm.Invoke((MethodInvoker)delegate
+                                    {
+                                        mainForm.processorsGrid[2, mainForm.problems[i].lastProcessorId - 1].Value = "Busy";
+                                        mainForm.processorsGrid[2, mainForm.problems[i].lastProcessorId - 1].Style.BackColor = Color.Yellow;
 
-                                    mainForm.problemsGrid[columnsCount, mainForm.problems[i].problemId].Value = "P" + mainForm.problems[i].lastProcessorId.ToString();
+                                        mainForm.problemsGrid[columnsCount, mainForm.problems[i].problemId].Value = "P" + mainForm.problems[i].lastProcessorId.ToString();
+                                        mainForm.problemsGrid[columnsCount, mainForm.problems[i].problemId].Style.BackColor = Color.LightGreen;
+                                    });
+
+                                    if (mainForm.problems[i].requiredTime - 1 != 0)
+                                    {
+                                        mainForm.processors[mainForm.problems[i].lastProcessorId - 1].isFree = false;
+                                        mainForm.processors[mainForm.problems[i].lastProcessorId - 1].lastUsedTime = time;
+                                        mainForm.processors[mainForm.problems[i].lastProcessorId - 1].lastProblemId = mainForm.problems[i].problemId;
+                                    }
+                                    else
+                                    {
+                                        mainForm.processorsGrid[2, mainForm.problems[i].lastProcessorId - 1].Value = "Free";
+                                        mainForm.processorsGrid[2, mainForm.problems[i].lastProcessorId - 1].Style.BackColor = Color.LightGreen;
+
+                                        mainForm.processors[mainForm.problems[i].lastProcessorId - 1].isFree = true;
+                                        mainForm.processors[mainForm.problems[i].lastProcessorId - 1].lastUsedTime = time;
+                                        mainForm.processors[mainForm.problems[i].lastProcessorId - 1].lastProblemId = mainForm.problems[i].problemId;
+                                    }
+                                    
 
                                     mainForm.problems[i].requiredTime--;
                                     mainForm.problems[i].ongoingTime++;
@@ -161,8 +269,19 @@ namespace CPU_Scheduling.Algorithms
 
                 columnsCount++;
                 time++;
+
+                await Task.Delay(100);
             }
-            while (notEnded);
+            while (notEnded && !mainForm.stopped);
+
+            mainForm.Invoke((MethodInvoker)delegate {
+                for (int i = 0; i < mainForm.numProc; i++)
+                {
+                    mainForm.processorsGrid[2, i].Value = "Free";
+                    mainForm.processorsGrid[2, i].Style.BackColor = Color.LightGreen;
+                    mainForm.processors[i].isFree = true;
+                }
+            });
         }
     }
 }

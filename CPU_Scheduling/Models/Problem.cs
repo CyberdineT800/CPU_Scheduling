@@ -36,7 +36,11 @@ namespace CPU_Scheduling.Models
         {
             return "ProblemId: " + problemId + "\n" +
                    ", Start time: " + startTime + "\n" +
-                   ", Req. time: " + requiredTime + "\n";
+                   ", Req. time: " + requiredTime + "\n" +
+                   ", Priority: " + priority + "\n" +
+                   ", Last Proc: " + lastProcessorId + "\n" +
+                   ", Going: " + ongoingTime + "\n" +
+                   ", Last wait: " + lastWaitingTime + "\n";
         }
     }
 }
